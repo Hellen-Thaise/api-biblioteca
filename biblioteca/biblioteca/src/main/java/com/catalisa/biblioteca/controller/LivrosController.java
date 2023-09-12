@@ -4,12 +4,14 @@ import com.catalisa.biblioteca.model.LivrosModel;
 import com.catalisa.biblioteca.service.LivrosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping(path = "/livros")
 public class LivrosController {
 
     @Autowired
@@ -19,7 +21,8 @@ public class LivrosController {
 
     // REQUISIÇÕES GET
     // método para mostrar todos os livros
-    @GetMapping(path = "/livros")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @GetMapping //(path = "/livros")
     public List<LivrosModel> exibirTodosOsLivros(){
         return livrosService.exibirTodos();
     }
@@ -31,7 +34,8 @@ public class LivrosController {
     }
 
     //REQUISIÇÃO POST - insere um novo livro no banco de dados
-    @PostMapping(path = "/livros")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping //(path = "/livros")
     @ResponseStatus(HttpStatus.CREATED)
     public LivrosModel inserirNovoLivro(@RequestBody LivrosModel livrosModel){
         return livrosService.inserir(livrosModel);
@@ -44,6 +48,7 @@ public class LivrosController {
     }
 
     // REQUISIÇÃO DELETE - deleta um livro do banco de dados
+
     @DeleteMapping(path = "/livros/{id}")
     public void deletarLivro(@PathVariable Long id){
         livrosService.deletar(id);
